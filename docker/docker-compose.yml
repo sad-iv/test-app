@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:1.25
+    container_name: ${PROJECT_NAME}-nginx
+    volumes:
+      - ../app:/usr/local/www/data/test-app
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php-fpm
+    restart: always
+    ports:
+      - "8080:80"
+  php-fpm:
+    container_name: ${PROJECT_NAME}-php-fpm
+    build:
+      dockerfile: ./php-fpm/Dockerfile
+      args:
+        - INSTALL_XDEBUG=${INSTALL_XDEBUG}
+    environment:
+      PHP_IDE_CONFIG: "serverName=Docker"
+    working_dir: /usr/local/www/data/test-app
+    volumes:
+      - ../app:/usr/local/www/data/test-app
+    restart: always
+
